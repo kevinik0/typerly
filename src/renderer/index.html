@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Typerly</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="titlebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><span></span></div>
+          <span>Typerly</span>
+        </div>
+        <div class="window-actions">
+          <button id="settingsButton" class="window-button settings-button" aria-label="Open settings" title="Settings">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 7.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z"/><path d="M16.1 11.3a6.4 6.4 0 0 0 0-2.6l1.5-1.1-1.7-2.9-1.8.8a7 7 0 0 0-2.2-1.3L11.7 2H8.3l-.2 2.2a7 7 0 0 0-2.2 1.3l-1.8-.8-1.7 2.9 1.5 1.1a6.4 6.4 0 0 0 0 2.6l-1.5 1.1 1.7 2.9 1.8-.8a7 7 0 0 0 2.2 1.3l.2 2.2h3.4l.2-2.2a7 7 0 0 0 2.2-1.3l1.8.8 1.7-2.9-1.5-1.1Z"/></svg>
+          </button>
+          <button id="closeButton" class="window-button" aria-label="Close to tray">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m5 5 6 6m0-6-6 6" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <main id="mainView" class="view">
+        <section class="clipboard-card" aria-labelledby="clipboardLabel">
+          <div class="card-heading">
+            <div>
+              <span id="clipboardLabel">Clipboard</span>
+              <span id="characterCount" class="character-count">0 characters</span>
+            </div>
+            <button id="refreshButton" class="icon-button" aria-label="Refresh clipboard" title="Refresh clipboard">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.2 7.1A6.5 6.5 0 1 0 16 13.3M16.2 7.1V3.8m0 3.3h-3.3" /></svg>
+            </button>
+          </div>
+          <div id="clipboardPreview" class="clipboard-preview empty">Copy some text to get started.</div>
+        </section>
+
+        <button id="typeButton" class="type-button" disabled>
+          <span class="button-copy">
+            <strong>Type</strong>
+            <small id="countdownLabel">Starts in 3 seconds</small>
+          </span>
+          <svg class="button-arrow" viewBox="0 0 20 20" aria-hidden="true"><path d="m7 5 5 5-5 5" /></svg>
+        </button>
+
+        <div class="pace-row">
+          <div>
+            <span class="pace-title">Speed</span>
+            <span id="paceDescription" class="pace-description">Natural · 30 ms</span>
+            <label id="customSpeedField" class="custom-speed hidden">
+              <input id="customSpeedInput" type="number" min="0" max="1000" step="1" inputmode="numeric" aria-label="Custom key delay in milliseconds" />
+              <span>ms</span>
+            </label>
+          </div>
+          <div class="segmented" role="group" aria-label="Typing pace">
+            <button data-delay="55">Slow</button>
+            <button class="selected" data-delay="30">Natural</button>
+            <button data-delay="8">Fast</button>
+            <button id="customPaceButton">Custom</button>
+          </div>
+        </div>
+      </main>
+
+      <main id="settingsView" class="view settings-view hidden">
+        <div class="settings-heading">
+          <h1>Settings</h1>
+          <p id="appVersion">Saved automatically</p>
+        </div>
+
+        <section class="settings-group">
+          <div class="setting-row">
+            <div class="setting-copy">
+              <strong>Appearance</strong>
+              <span>Choose how Typerly looks</span>
+            </div>
+            <div class="theme-toggle" role="group" aria-label="Appearance">
+              <button data-theme-value="light">Light</button>
+              <button data-theme-value="dark">Dark</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-copy">
+              <strong>Countdown</strong>
+              <span>Delay before typing</span>
+            </div>
+            <label class="number-input">
+              <input id="countdownInput" type="number" min="0" max="10" step="1" inputmode="numeric" />
+              <span>sec</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="shortcut-setting">
+          <div class="setting-copy">
+            <strong>Type shortcut</strong>
+            <span>Use it from any application</span>
+          </div>
+          <button id="shortcutRecorder" class="shortcut-recorder">
+            <span id="shortcutKeys">Ctrl + Alt + T</span>
+            <small>Click to change</small>
+          </button>
+          <p>Press Escape to cancel while recording.</p>
+        </section>
+      </main>
+
+      <footer>
+        <span id="shortcutHint"><kbd>Ctrl</kbd><b>+</b><kbd>Alt</kbd><b>+</b><kbd>T</kbd> anywhere</span>
+        <span>Closes to tray</span>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

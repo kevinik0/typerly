@@ -1,0 +1,71 @@
+{
+  "name": "typerly",
+  "version": "1.2.0",
+  "description": "A quiet clipboard-to-keystrokes utility for Windows.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinik0/typerly.git"
+  },
+  "main": "src/main.js",
+  "author": "Typerly",
+  "license": "MIT",
+  "scripts": {
+    "icons": "node scripts/generate-icons.mjs",
+    "start": "electron .",
+    "check": "node --check src/main.js && node --check src/preload.js && node --check src/renderer/renderer.js",
+    "capture": "electron scripts/capture-ui.js",
+    "smoke:clipboard": "electron scripts/smoke-clipboard.js",
+    "smoke:typing": "electron scripts/smoke-typing.js",
+    "pack": "npm run icons && electron-builder --dir",
+    "dist": "npm run icons && electron-builder --win nsis",
+    "release": "npm run icons && electron-builder --win nsis --publish always"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.typerly.app",
+    "productName": "Typerly",
+    "asar": true,
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "src/typing-worker.ps1",
+        "to": "typing-worker.ps1"
+      },
+      {
+        "from": "assets/tray-icon.png",
+        "to": "tray-icon.png"
+      },
+      {
+        "from": "assets/icon.ico",
+        "to": "icon.ico"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Typerly"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "kevinik0",
+      "repo": "typerly",
+      "releaseType": "release"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  }
+}
