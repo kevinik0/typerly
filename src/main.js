@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const APP_NAME = 'Typerly';
 const DEFAULT_SETTINGS = {
+  settingsSchemaVersion: 2,
   delayMs: 30,
   countdownSeconds: 3,
   shortcut: 'Control+Alt+T',
@@ -40,7 +41,11 @@ function settingsPath() {
 
 function loadSettings() {
   try {
-    settings = { ...DEFAULT_SETTINGS, ...JSON.parse(fs.readFileSync(settingsPath(), 'utf8')) };
+    const savedSettings = JSON.parse(fs.readFileSync(settingsPath(), 'utf8'));
+    const shouldUpgradeFastPreset = (savedSettings.settingsSchemaVersion || 1) < 2 && savedSettings.delayMs === 8;
+    settings = { ...DEFAULT_SETTINGS, ...savedSettings, settingsSchemaVersion: 2 };
+    if (shouldUpgradeFastPreset) settings.delayMs = 0;
+    if ((savedSettings.settingsSchemaVersion || 1) < 2) saveSettings();
   } catch {
     settings = { ...DEFAULT_SETTINGS };
   }

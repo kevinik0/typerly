@@ -38,7 +38,7 @@ app.whenReady().then(async () => {
       }
       if (line.trim() === 'DONE|focus') {
         const payload = Buffer.from(expected, 'utf16le').toString('base64');
-        setTimeout(() => worker.stdin.write(`TYPE|smoke|8|${payload}\n`), 250);
+        setTimeout(() => worker.stdin.write(`TYPE|smoke|0|${payload}\n`), 250);
       }
       if (line.trim() === 'DONE|smoke') {
         await new Promise((resolve) => setTimeout(resolve, 350));

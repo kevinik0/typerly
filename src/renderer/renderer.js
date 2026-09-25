@@ -27,7 +27,7 @@ let isRecordingShortcut = false;
 let pollTimer;
 let speedSaveTimer;
 
-const paceNames = { 55: 'Slow', 30: 'Natural', 8: 'Fast' };
+const paceNames = { 55: 'Slow', 30: 'Natural', 0: 'Fast' };
 
 function clampNumber(value, minimum, maximum, fallback) {
   const number = Number(value);

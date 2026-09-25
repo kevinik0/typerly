@@ -1,6 +1,6 @@
 {
   "name": "typerly",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A quiet clipboard-to-keystrokes utility for Windows.",
   "repository": {
     "type": "git",
