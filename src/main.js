@@ -391,16 +391,28 @@ async function beginTyping(delayMs = settings.delayMs) {
   const seconds = settings.countdownSeconds;
   setStatus('countdown', seconds > 0 ? `Starting in ${seconds}` : 'Starting');
   if (mainWindow?.isVisible()) mainWindow.minimize();
-  globalShortcut.register('Escape', cancelTyping);
 
   const startKeystrokes = () => {
-    if (!currentJob) return;
+    if (!currentJob || currentJob.phase !== 'countdown') return;
     countdownWindow?.hide();
     currentJob.phase = 'typing';
     setStatus('typing', `Typing ${text.length.toLocaleString()} characters`);
     const payload = Buffer.from(text, 'utf16le').toString('base64');
     worker.stdin.write(`TYPE|${currentJob.id}|${settings.delayMs}|${payload}\n`);
   };
+
+  const skipCountdown = () => {
+    if (!currentJob || currentJob.phase !== 'countdown') return;
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+    log('Countdown skipped with Space');
+    startKeystrokes();
+  };
+
+  globalShortcut.register('Escape', cancelTyping);
+  if (seconds > 0 && !globalShortcut.register('Space', skipCountdown)) {
+    log('Could not register Space to skip the countdown');
+  }
 
   if (seconds === 0) {
     countdownTimer = setTimeout(() => {
@@ -438,6 +450,7 @@ function finishJob(outcome, detail = '') {
   clearInterval(countdownTimer);
   countdownTimer = null;
   globalShortcut.unregister('Escape');
+  globalShortcut.unregister('Space');
   countdownWindow?.hide();
   if (outcome === 'complete') setStatus('ready', 'Finished');
   else if (outcome === 'error') setStatus('error', detail || 'Could not type text');

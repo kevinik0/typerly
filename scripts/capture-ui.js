@@ -6,7 +6,7 @@ const root = path.join(__dirname, '..');
 const output = path.join(root, 'artifacts', 'typerly-ui.png');
 const settingsOutput = path.join(root, 'artifacts', 'typerly-settings.png');
 const darkSettingsOutput = path.join(root, 'artifacts', 'typerly-settings-dark.png');
-let mockSettings = { delayMs: 30, countdownSeconds: 3, shortcut: 'Control+Alt+T', theme: 'light', launchAtLogin: false, version: '1.2.1' };
+let mockSettings = { delayMs: 30, countdownSeconds: 3, shortcut: 'Control+Alt+T', theme: 'light', launchAtLogin: false, version: '1.2.2' };
 
 ipcMain.handle('clipboard:read', async () => 'A quiet little utility that turns your clipboard into real keystrokes.');
 ipcMain.handle('settings:get', () => mockSettings);

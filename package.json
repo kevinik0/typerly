@@ -1,6 +1,6 @@
 {
   "name": "typerly",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A quiet clipboard-to-keystrokes utility for Windows.",
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
     "check": "node --check src/main.js && node --check src/preload.js && node --check src/renderer/renderer.js",
     "capture": "electron scripts/capture-ui.js",
     "smoke:clipboard": "electron scripts/smoke-clipboard.js",
+    "smoke:shortcut": "electron scripts/smoke-space-shortcut.js",
     "smoke:typing": "electron scripts/smoke-typing.js",
     "pack": "npm run icons && electron-builder --dir",
     "dist": "npm run icons && electron-builder --win nsis",
