@@ -25,9 +25,22 @@ jobs:
       - name: Check source
         run: npm run check
 
-      - name: Publish Windows release
-        run: npx electron-builder --win nsis --publish always
+      - name: Build Windows release
+        run: npm run dist
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
+      - name: Publish GitHub release
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          gh release create $env:GITHUB_REF_NAME `
+            "dist/latest.yml" `
+            "dist/Typerly-Setup-$version.exe" `
+            "dist/Typerly-Setup-$version.exe.blockmap" `
+            --repo $env:GITHUB_REPOSITORY `
+            --title $version `
+            --generate-notes `
+            --latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

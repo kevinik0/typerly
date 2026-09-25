@@ -27,6 +27,7 @@
   "build": {
     "appId": "com.typerly.app",
     "productName": "Typerly",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
     "asar": true,
     "files": [
       "src/**/*",
