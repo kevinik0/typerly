@@ -26,7 +26,7 @@ jobs:
         run: npm run check
 
       - name: Build Windows release
-        run: npm run dist
+        run: npm run icons && npx electron-builder --win nsis --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
