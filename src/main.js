@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const APP_NAME = 'Typerly';
+const STARTUP_ARGUMENTS = ['--hidden'];
 const DEFAULT_SETTINGS = {
   settingsSchemaVersion: 2,
   delayMs: 30,
@@ -55,6 +56,27 @@ function saveSettings() {
   fs.writeFileSync(settingsPath(), JSON.stringify(settings, null, 2));
 }
 
+function getLaunchAtLogin() {
+  try {
+    const status = app.getLoginItemSettings({ path: process.execPath, args: STARTUP_ARGUMENTS });
+    return status.openAtLogin && status.executableWillLaunchAtLogin !== false;
+  } catch (error) {
+    log(`Could not read startup setting: ${error.message}`);
+    return Boolean(settings.launchAtLogin);
+  }
+}
+
+function setLaunchAtLogin(enabled) {
+  settings.launchAtLogin = Boolean(enabled);
+  app.setLoginItemSettings({
+    openAtLogin: settings.launchAtLogin,
+    path: process.execPath,
+    args: STARTUP_ARGUMENTS,
+    enabled: settings.launchAtLogin,
+    name: APP_NAME
+  });
+}
+
 async function readClipboardText() {
   const value = await clipboard.readText();
   return typeof value === 'string' ? value : '';
@@ -71,18 +93,20 @@ function log(message) {
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 360,
-    height: 430,
-    minWidth: 360,
-    minHeight: 430,
-    maxWidth: 360,
-    maxHeight: 430,
+    width: 390,
+    height: 530,
+    minWidth: 390,
+    minHeight: 530,
+    maxWidth: 390,
+    maxHeight: 530,
     show: false,
     frame: false,
+    transparent: true,
+    backgroundMaterial: process.platform === 'win32' ? 'acrylic' : undefined,
     resizable: false,
     maximizable: false,
     fullscreenable: false,
-    backgroundColor: settings.theme === 'dark' ? '#151616' : '#f7f7f5',
+    backgroundColor: '#00000000',
     icon: resourceFile('icon.ico', path.join('assets', 'icon.ico')),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -106,13 +130,14 @@ function createCountdownWindow() {
   const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
   const { x, y, width, height } = display.workArea;
   countdownWindow = new BrowserWindow({
-    width: 212,
-    height: 96,
-    x: Math.round(x + width / 2 - 106),
-    y: Math.round(y + height - 128),
+    width: 276,
+    height: 116,
+    x: Math.round(x + width / 2 - 138),
+    y: Math.round(y + height - 148),
     show: false,
     frame: false,
     transparent: true,
+    backgroundMaterial: process.platform === 'win32' ? 'acrylic' : undefined,
     alwaysOnTop: true,
     skipTaskbar: true,
     focusable: false,
@@ -191,11 +216,11 @@ function buildTrayMenu() {
     {
       label: 'Start with Windows',
       type: 'checkbox',
-      checked: app.getLoginItemSettings().openAtLogin,
+      checked: getLaunchAtLogin(),
       click: (item) => {
-        settings.launchAtLogin = item.checked;
-        app.setLoginItemSettings({ openAtLogin: item.checked, openAsHidden: true, args: ['--hidden'] });
+        setLaunchAtLogin(item.checked);
         saveSettings();
+        mainWindow?.webContents.send('settings-changed', { launchAtLogin: item.checked });
       }
     },
     { label: 'Check for updates', enabled: !updateReadyVersion, click: () => checkForUpdates(true) },
@@ -476,7 +501,7 @@ ipcMain.handle('settings:get', () => ({
   countdownSeconds: settings.countdownSeconds,
   shortcut: settings.shortcut,
   theme: settings.theme,
-  launchAtLogin: app.getLoginItemSettings().openAtLogin,
+  launchAtLogin: getLaunchAtLogin(),
   version: app.getVersion()
 }));
 ipcMain.handle('settings:set', (_event, next) => {
@@ -488,15 +513,15 @@ ipcMain.handle('settings:set', (_event, next) => {
   if (next.theme === 'light' || next.theme === 'dark') {
     if (settings.theme !== next.theme && countdownWindow && !currentJob) countdownWindow.destroy();
     settings.theme = next.theme;
-    mainWindow?.setBackgroundColor(next.theme === 'dark' ? '#151616' : '#f7f7f5');
+    mainWindow?.setBackgroundColor('#00000000');
   }
   if (typeof next.shortcut === 'string' && next.shortcut !== settings.shortcut) {
     if (registerTypingShortcut(next.shortcut)) settings.shortcut = next.shortcut;
     else shortcutError = true;
   }
   if (typeof next.launchAtLogin === 'boolean') {
-    settings.launchAtLogin = next.launchAtLogin;
-    app.setLoginItemSettings({ openAtLogin: next.launchAtLogin, openAsHidden: true, args: ['--hidden'] });
+    setLaunchAtLogin(next.launchAtLogin);
+    tray?.setContextMenu(buildTrayMenu());
   }
   saveSettings();
   return { ...settings, shortcutError };

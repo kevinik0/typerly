@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('typerly', {
   close: () => ipcRenderer.send('window:close'),
   onClipboardChanged: (callback) => ipcRenderer.on('clipboard-changed', (_event, text) => callback(text)),
   onStatusChanged: (callback) => ipcRenderer.on('status-changed', (_event, data) => callback(data)),
+  onSettingsChanged: (callback) => ipcRenderer.on('settings-changed', (_event, data) => callback(data)),
   onTypingFinished: (callback) => ipcRenderer.on('typing-finished', (_event, data) => callback(data)),
   onUpdateStatus: (callback) => ipcRenderer.on('update-status', (_event, data) => callback(data))
 });

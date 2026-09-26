@@ -12,6 +12,7 @@ const mainView = document.getElementById('mainView');
 const settingsView = document.getElementById('settingsView');
 const countdownInput = document.getElementById('countdownInput');
 const countdownLabel = document.getElementById('countdownLabel');
+const launchAtLoginToggle = document.getElementById('launchAtLoginToggle');
 const themeButtons = [...document.querySelectorAll('[data-theme-value]')];
 const shortcutRecorder = document.getElementById('shortcutRecorder');
 const shortcutKeys = document.getElementById('shortcutKeys');
@@ -157,6 +158,12 @@ customSpeedInput.addEventListener('blur', () => setPace(customSpeedInput.value, 
 settingsButton.addEventListener('click', toggleSettings);
 themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.themeValue)));
 countdownInput.addEventListener('change', () => setCountdown(countdownInput.value));
+launchAtLoginToggle.addEventListener('change', async () => {
+  const result = await window.typerly.setSettings({ launchAtLogin: launchAtLoginToggle.checked });
+  currentSettings.launchAtLogin = Boolean(result.launchAtLogin);
+  launchAtLoginToggle.checked = currentSettings.launchAtLogin;
+  showToast(currentSettings.launchAtLogin ? 'Opens with Windows' : 'Startup disabled');
+});
 
 shortcutRecorder.addEventListener('click', async () => {
   if (isRecordingShortcut) return;
@@ -213,6 +220,11 @@ window.typerly.onClipboardChanged(setClipboard);
 window.typerly.onStatusChanged(({ status, detail }) => {
   if (status === 'error') showToast(detail || 'Something went wrong');
 });
+window.typerly.onSettingsChanged(({ launchAtLogin }) => {
+  if (typeof launchAtLogin !== 'boolean') return;
+  currentSettings.launchAtLogin = launchAtLogin;
+  launchAtLoginToggle.checked = launchAtLogin;
+});
 window.typerly.onTypingFinished(({ outcome, characters }) => {
   isBusy = false;
   typeButton.disabled = !clipboardText;
@@ -238,6 +250,7 @@ window.addEventListener('blur', () => clearInterval(pollTimer));
   appVersion.textContent = `Version ${currentSettings.version} · updates automatically`;
   applyTheme(currentSettings.theme, false);
   setCountdown(currentSettings.countdownSeconds, false);
+  launchAtLoginToggle.checked = Boolean(currentSettings.launchAtLogin);
   setPace(Number(currentSettings.delayMs), !Object.hasOwn(paceNames, Number(currentSettings.delayMs)), false);
   renderShortcut(currentSettings.shortcut);
   await refreshClipboard();

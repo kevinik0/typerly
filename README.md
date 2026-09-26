@@ -32,4 +32,4 @@ Maintainers can publish a new release by updating the version, committing, and p
 - Press `Space` during the countdown to start typing immediately.
 - Press `Esc` during the countdown or while typing to cancel.
 - Closing the window keeps Typerly running in the tray. Use **Quit Typerly** in the tray menu to exit completely.
-- Open Settings to customize the global shortcut, countdown, theme, and choose any key delay from 0–1000 ms.
+- Open Settings to customize the global shortcut, countdown, theme, startup behavior, and choose any key delay from 0–1000 ms.

@@ -6,7 +6,8 @@ const root = path.join(__dirname, '..');
 const output = path.join(root, 'artifacts', 'typerly-ui.png');
 const settingsOutput = path.join(root, 'artifacts', 'typerly-settings.png');
 const darkSettingsOutput = path.join(root, 'artifacts', 'typerly-settings-dark.png');
-let mockSettings = { delayMs: 30, countdownSeconds: 3, shortcut: 'Control+Alt+T', theme: 'light', launchAtLogin: false, version: '1.2.2' };
+const countdownOutput = path.join(root, 'artifacts', 'typerly-countdown.png');
+let mockSettings = { delayMs: 30, countdownSeconds: 3, shortcut: 'Control+Alt+T', theme: 'light', launchAtLogin: false, version: '1.3.0' };
 
 ipcMain.handle('clipboard:read', async () => 'A quiet little utility that turns your clipboard into real keystrokes.');
 ipcMain.handle('settings:get', () => mockSettings);
@@ -20,11 +21,11 @@ ipcMain.handle('typing:cancel', () => true);
 
 app.whenReady().then(async () => {
   const window = new BrowserWindow({
-    width: 360,
-    height: 430,
+    width: 390,
+    height: 530,
     show: false,
     frame: false,
-    backgroundColor: '#f7f7f5',
+    backgroundColor: '#cbd9ef',
     webPreferences: {
       preload: path.join(root, 'src', 'preload.js'),
       contextIsolation: true,
@@ -33,6 +34,7 @@ app.whenReady().then(async () => {
     }
   });
   await window.loadFile(path.join(root, 'src', 'renderer', 'index.html'));
+  window.showInactive();
   await new Promise((resolve) => setTimeout(resolve, 250));
   const state = await window.webContents.executeJavaScript(`(() => {
     const button = document.getElementById('typeButton');
@@ -55,10 +57,22 @@ app.whenReady().then(async () => {
   fs.writeFileSync(settingsOutput, settingsImage.toPNG());
   console.log(settingsOutput);
 
+  await window.webContents.executeJavaScript("document.getElementById('launchAtLoginToggle').click()", true);
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const startupEnabled = await window.webContents.executeJavaScript("document.getElementById('launchAtLoginToggle').checked", true);
+  if (!startupEnabled || !mockSettings.launchAtLogin) throw new Error('Startup toggle failed.');
+  console.log('Startup toggle state: enabled');
+
   await window.webContents.executeJavaScript("document.querySelector('[data-theme-value=dark]').click()", true);
   await new Promise((resolve) => setTimeout(resolve, 100));
   const activeTheme = await window.webContents.executeJavaScript("document.documentElement.dataset.theme", true);
   if (activeTheme !== 'dark') throw new Error(`Theme switch failed: ${activeTheme}`);
+  const darkStyle = await window.webContents.executeJavaScript(`(() => {
+    const root = getComputedStyle(document.documentElement);
+    const shell = getComputedStyle(document.querySelector('.app-shell'));
+    return { shellVariable: root.getPropertyValue('--shell'), textVariable: root.getPropertyValue('--text'), color: shell.color, background: shell.backgroundImage };
+  })()`, true);
+  console.log(`Dark theme style: ${JSON.stringify(darkStyle)}`);
   const darkSettingsImage = await window.webContents.capturePage();
   fs.writeFileSync(darkSettingsOutput, darkSettingsImage.toPNG());
   console.log(darkSettingsOutput);
@@ -82,5 +96,12 @@ app.whenReady().then(async () => {
   })()`, true);
   if (customSpeed.value !== '73' || customSpeed.hidden) throw new Error(`Custom speed control failed: ${JSON.stringify(customSpeed)}`);
   console.log(`Custom speed state: ${JSON.stringify(customSpeed)}`);
+
+  window.setSize(276, 116);
+  await window.loadFile(path.join(root, 'src', 'renderer', 'countdown.html'), { query: { theme: 'light', seconds: '3' } });
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const countdownImage = await window.webContents.capturePage();
+  fs.writeFileSync(countdownOutput, countdownImage.toPNG());
+  console.log(countdownOutput);
   app.quit();
 });

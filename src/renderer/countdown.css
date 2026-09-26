@@ -1,37 +1,107 @@
 * { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; user-select: none; }
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #11141b;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
 body { display: grid; place-items: center; }
+
 .countdown-card {
-  width: 200px;
-  height: 80px;
-  padding: 11px 13px;
+  position: relative;
+  width: 260px;
+  height: 96px;
+  padding: 13px 14px;
   display: flex;
   align-items: center;
-  gap: 11px;
-  color: #1d1d1b;
-  background: rgba(255,255,255,.97);
-  border: 1px solid rgba(20,20,18,.1);
-  border-radius: 14px;
-  box-shadow: 0 12px 36px rgba(20,20,18,.18);
+  gap: 13px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.84);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(132,205,255,.34), transparent 42%),
+    linear-gradient(145deg, rgba(250,253,255,.82), rgba(234,241,253,.68));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 18px 46px rgba(41,63,101,.3);
+  backdrop-filter: blur(34px) saturate(1.5);
 }
+
+.countdown-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 55% 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.3), transparent);
+  pointer-events: none;
+}
+
 .ring {
-  width: 46px;
-  height: 46px;
-  flex: 0 0 46px;
+  position: relative;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
   display: grid;
   place-items: center;
+  border: 1px solid rgba(255,255,255,.5);
   border-radius: 50%;
   color: white;
-  background: #2563eb;
+  background: linear-gradient(145deg, #1591ff, #6269f2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 8px 20px rgba(22,118,232,.3);
 }
-.ring span { font-size: 21px; font-weight: 650; }
-.ring span.tick { animation: tick .28s ease; }
-@keyframes tick { from { transform: scale(1.2); opacity: .5; } }
-.copy { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.copy strong { font-size: 11px; }
-.copy span { color: #92928d; font-size: 8.5px; }
-kbd { align-self: flex-end; padding: 3px 5px; border: 1px solid #e4e4df; border-radius: 4px; color: #999994; font: 7.5px inherit; background: #f7f7f5; }
+.ring::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: inherit;
+}
+.ring span { position: relative; z-index: 1; font-size: 22px; line-height: 1; font-weight: 720; letter-spacing: -.4px; }
+.ring span.tick { animation: tick .3s cubic-bezier(.22, 1, .36, 1); }
+@keyframes tick { from { transform: scale(1.28); opacity: .45; } }
 
-:root[data-theme="dark"] .countdown-card { color: #f1f1ef; background: rgba(30,31,31,.98); border-color: #363737; box-shadow: 0 12px 36px rgba(0,0,0,.38); }
-:root[data-theme="dark"] .copy span { color: #92938f; }
-:root[data-theme="dark"] kbd { color: #999a96; background: #252626; border-color: #393a39; }
+.copy { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.copy strong { font-size: 13px; font-weight: 710; letter-spacing: -.22px; }
+.copy span { color: rgba(17,20,27,.48); font-size: 9px; white-space: nowrap; }
+
+kbd {
+  position: relative;
+  align-self: center;
+  height: 28px;
+  padding: 0 9px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.78);
+  border-radius: 999px;
+  color: rgba(17,20,27,.58);
+  background: rgba(255,255,255,.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 4px 12px rgba(41,63,101,.13);
+  font: 650 8px inherit;
+}
+
+:root[data-theme="dark"] body { color: #f7f8ff; }
+:root[data-theme="dark"] .countdown-card {
+  border-color: rgba(221,232,255,.2);
+  background:
+    radial-gradient(circle at 8% 8%, rgba(55,154,255,.22), transparent 42%),
+    linear-gradient(145deg, rgba(28,38,58,.9), rgba(17,23,38,.84));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 18px 48px rgba(0,0,0,.46);
+}
+:root[data-theme="dark"] .countdown-card::before { background: linear-gradient(180deg, rgba(255,255,255,.08), transparent); }
+:root[data-theme="dark"] .copy span { color: rgba(230,235,252,.52); }
+:root[data-theme="dark"] kbd {
+  color: rgba(240,244,255,.62);
+  border-color: rgba(221,232,255,.16);
+  background: rgba(60,72,98,.48);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 4px 12px rgba(0,0,0,.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring span.tick { animation: none; }
+}
